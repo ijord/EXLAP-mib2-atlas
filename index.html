@@ -282,11 +282,11 @@ const MAPPED_CREDS=OPEN_CREDS.filter(c=>c.urls);
 for(const o of DATA)o.g=MAPPED_CREDS.filter(c=>c.urls.has(o.n)).map(c=>c.key);
 const $=s=>document.querySelector(s);
 const urls=DATA.filter(o=>o.k==='url'), schemas=DATA.filter(o=>o.k==='schema'),
- rseOnly=urls.filter(o=>o.r==='RSE'), seen=urls.filter(o=>o.x),
+ seen=urls.filter(o=>o.x),
  doms=[...new Set(DATA.map(o=>o.d))].sort();
 // stats
 $('#stats').innerHTML=[
- [''+urls.length,'addressable URLs',1],[''+seen.length,'reference-unit sample',0],[''+rseOnly.length,'Rear Seat Entertainment-only URLs',0],[''+schemas.length,'nested schema types',0],[''+OPEN_CREDS.length,'selectable profiles',0]
+ [''+urls.length,'addressable URLs',1],[''+seen.length,'reference-unit sample',0],[''+schemas.length,'nested schema types',0],[''+OPEN_CREDS.length,'selectable profiles',0]
 ].map(([v,k,hl])=>`<div class="stat${hl?' hl':''}"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
 // union profile picker
 $('#profilepicker').innerHTML=OPEN_CREDS.map(c=>`<button class="profile-option" aria-pressed="false"
