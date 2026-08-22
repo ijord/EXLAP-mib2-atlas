@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EXLAP Object Atlas</title>
+<style>
+:root{
+  --bg:#eceff4; --surface:#ffffff; --surface-2:#f4f6fa; --surface-3:#e7ebf2;
+  --text:#161b24; --text-dim:#586172; --text-faint:#8a93a2;
+  --border:#dde2ea; --border-strong:#c8cfdb;
+  --accent:#a4650a; --accent-soft:rgba(164,101,10,.12);
+  --c-VD:#246fa8; --c-NAV:#7251b5; --c-ECO:#23835f; --c-INT:#bc671f; --c-MISC:#287f8d;
+  --c-PERF:#b54145; --c-DEFAULT:#66717f; --c-GENERAL:#9b6b13; --c-MEDIA:#b04781;
+  --c-PREMIUM:#8c4ca3; --c-ALL:#3d4d63; --c-UNKNOWN:#a34b4d;
+  --shadow:0 1px 2px rgba(22,27,40,.05),0 10px 30px rgba(22,27,40,.06);
+  --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1116; --surface:#161c24; --surface-2:#1b222b; --surface-3:#232c37;
+  --text:#e8ebf1; --text-dim:#8d97a5; --text-faint:#616b79;
+  --border:#252e39; --border-strong:#323d4b;
+  --accent:#e9aa4b; --accent-soft:rgba(233,170,75,.14);
+  --c-VD:#67afe3; --c-NAV:#ad8be5; --c-ECO:#54bd93; --c-INT:#e6a064; --c-MISC:#65bcc7;
+  --c-PERF:#e2787c; --c-DEFAULT:#9aa6b5; --c-GENERAL:#dbad56; --c-MEDIA:#dc82ad;
+  --c-PREMIUM:#c98add; --c-ALL:#91a7c3; --c-UNKNOWN:#db7476;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px rgba(0,0,0,.36);
+}}
+:root[data-theme="dark"]{
+  --bg:#0d1116; --surface:#161c24; --surface-2:#1b222b; --surface-3:#232c37;
+  --text:#e8ebf1; --text-dim:#8d97a5; --text-faint:#616b79;
+  --border:#252e39; --border-strong:#323d4b;
+  --accent:#e9aa4b; --accent-soft:rgba(233,170,75,.14);
+  --c-VD:#67afe3; --c-NAV:#ad8be5; --c-ECO:#54bd93; --c-INT:#e6a064; --c-MISC:#65bcc7;
+  --c-PERF:#e2787c; --c-DEFAULT:#9aa6b5; --c-GENERAL:#dbad56; --c-MEDIA:#dc82ad;
+  --c-PREMIUM:#c98add; --c-ALL:#91a7c3; --c-UNKNOWN:#db7476;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 34px rgba(0,0,0,.36);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1120px;margin:0 auto;padding:clamp(20px,4vw,44px) clamp(16px,4vw,32px) 80px;}
+a{color:var(--accent)}
+h1,h2,h3{text-wrap:balance;margin:0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);font-weight:600;}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin:.28em 0 .18em;}
+.lede{color:var(--text-dim);max-width:64ch;font-size:16px;margin:0}
+.lede b{color:var(--text);font-weight:600}
+/* stat tiles */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:26px 0 30px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.stat .v{font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;font-family:var(--mono)}
+.stat.hl .v{color:var(--accent)}
+.stat .k{font-size:11.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+/* reference cards */
+.ref{display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:30px}
+@media(max-width:760px){.ref{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow);min-width:0}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--text-dim);font-weight:600;margin-bottom:12px}
+.profilepicker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+@media(max-width:560px){.profilepicker{grid-template-columns:1fr}}
+.profile-option{--pc:var(--text-dim);text-align:left;display:grid;grid-template-columns:1fr auto;gap:2px 8px;
+  border:1px solid var(--border-strong);border-left:4px solid var(--pc);border-radius:9px;padding:8px 10px;
+  background:var(--surface-2);color:var(--text);cursor:pointer;font-family:var(--sans)}
+.profile-option:hover{border-color:var(--pc)}
+.profile-option[aria-pressed="true"]{background:color-mix(in srgb,var(--pc) 15%,var(--surface));border-color:var(--pc)}
+.profile-option .pn{font-size:12px;font-weight:650;line-height:1.3}
+.profile-option .pc{font-family:var(--mono);font-size:10.5px;color:var(--text-dim)}
+.profile-option .check{grid-row:1/3;grid-column:2;font-size:15px;color:var(--pc);align-self:center}
+.unionresult{margin-top:12px;border:1px solid var(--border-strong);border-radius:11px;background:var(--surface-2);padding:11px 12px}
+.unionhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.unionhead b{font-size:12px}.quietbtn{border:0;background:transparent;color:var(--text-dim);font:600 11px var(--mono);cursor:pointer;padding:3px 5px}
+.quietbtn:hover{color:var(--accent)}
+.uniongrid{display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px 10px;align-items:center}
+.uniongrid .label{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint)}
+.copyvalue{width:100%;text-align:left;border:1px solid var(--border);border-radius:7px;background:var(--surface);
+  color:var(--accent);padding:6px 8px;font:650 11px/1.35 var(--mono);word-break:break-all;cursor:pointer;user-select:all}
+.copyvalue:disabled{color:var(--text-faint);cursor:default}
+.unionscope{margin:8px 0 0;font-size:11.5px;color:var(--text-dim)}
+.unionscope.warn{color:var(--c-GENERAL)}
+code,pre{font-family:var(--mono)}
+pre{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 12px;margin:0;
+  font-size:11.5px;line-height:1.65;overflow-x:auto;color:var(--text-dim)}
+pre b{color:var(--text);font-weight:600}
+pre .k{color:var(--accent)}
+.note{font-size:12px;color:var(--text-dim);margin-top:10px}
+.verbs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.verb{font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim)}
+.verb.on{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent);font-weight:600}
+/* controls */
+.controls{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);
+  backdrop-filter:blur(8px);padding:12px 0 12px;margin-bottom:4px;border-bottom:1px solid var(--border)}
+.controls .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.search{flex:1 1 220px;position:relative;min-width:180px}
+.search input{width:100%;padding:9px 12px 9px 32px;border-radius:9px;border:1px solid var(--border-strong);
+  background:var(--surface);color:var(--text);font-size:14px;font-family:var(--sans)}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--text-faint)}
+select{padding:9px 10px;border-radius:9px;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);font-size:13px;font-family:var(--sans)}
+select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.credfilter{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.credfilter .lbl{font-size:11.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.06em;margin-right:2px}
+.chip{font-family:var(--mono);font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border-strong);background:var(--surface);color:var(--text-dim);display:inline-flex;align-items:center;gap:6px}
+.chip:hover{border-color:var(--pc,var(--accent))}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--pc,var(--text-faint))}
+.chip[aria-pressed="true"]{background:color-mix(in srgb,var(--pc,var(--accent)) 16%,transparent);
+  border-color:color-mix(in srgb,var(--pc,var(--accent)) 55%,transparent);color:var(--text)}
+.count{margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--text-dim);font-variant-numeric:tabular-nums}
+/* table */
+.tablewrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px;background:var(--surface);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{position:sticky;top:0;background:var(--surface-3);text-align:left;font-size:11px;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--text-dim);font-weight:600;padding:10px 14px;border-bottom:1px solid var(--border-strong);white-space:nowrap}
+thead th.sortable{cursor:pointer;user-select:none}
+thead th.sortable:hover{color:var(--text)}
+thead th .ar{opacity:.45;font-size:10px}
+tbody td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+.obj{font-family:var(--mono);font-size:13px;color:var(--text);cursor:pointer}
+.obj:hover{color:var(--accent)}
+tr.schema .obj{color:var(--text-dim)}
+.dom{font-size:12.5px;color:var(--text-dim);white-space:nowrap}
+.acc{display:flex;flex-wrap:wrap;gap:4px}
+.pill{--pc:var(--text-faint);display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;
+  font-weight:600;padding:2px 7px;border-radius:6px;color:var(--pc);
+  background:color-mix(in srgb,var(--pc) 14%,transparent);border:1px solid color-mix(in srgb,var(--pc) 30%,transparent)}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--pc)}
+.pill[data-c=VD]{--pc:var(--c-VD)} .pill[data-c=NAV]{--pc:var(--c-NAV)} .pill[data-c=ECO]{--pc:var(--c-ECO)}
+.pill[data-c=INT]{--pc:var(--c-INT)} .pill[data-c=MISC]{--pc:var(--c-MISC)} .pill[data-c=PERF]{--pc:var(--c-PERF)}
+.pill[data-c=DEFAULT]{--pc:var(--c-DEFAULT)} .pill[data-c=ALL]{--pc:var(--c-ALL)} .pill[data-c=UNKNOWN]{--pc:var(--c-UNKNOWN)}
+.pill[data-c=RSE]{--pc:var(--c-GENERAL)} .pill[data-c=HP]{--pc:var(--c-PERF)}
+.pill[data-op=read]{--pc:var(--c-VD)} .pill[data-op=call]{--pc:var(--c-INT)}
+.pill.tier{background:transparent;border-style:dashed}
+.gateexpr{font-family:var(--mono);font-size:10.5px;color:var(--text-dim);white-space:nowrap}
+.gateexpr b{color:var(--text);font-weight:650}
+.gateor{align-self:center;font:600 9px var(--mono);color:var(--text-faint)}
+.empty{padding:40px;text-align:center;color:var(--text-dim);font-size:14px}
+footer{margin-top:26px;font-size:12px;color:var(--text-faint);line-height:1.7}
+footer b{color:var(--text-dim);font-weight:600}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;
+  background:var(--text);color:var(--bg);font-size:12.5px;font-family:var(--mono);padding:8px 14px;border-radius:8px;
+  transition:opacity .2s,transform .2s;pointer-events:none;z-index:20}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">VW Group MIB2 HIGH · cross-unit reference · reverse-engineered</div>
+  <h1>EXLAP Object Atlas</h1>
+  <p class="lede"><b>260 compiled data and control objects</b> from an analyzed VW Group MIB2 HIGH build,
+  split into <b>229 addressable URLs</b> and <b>31 nested schema types</b>. Each URL is mapped to its exact
+  registration predicate over Vehicle Data, Navigation, Rear Seat Entertainment and High Performance FSIDs, plus the published
+  <code>OPEN-*</code> credential profiles where directly measured.</p>
+  <div class="stats" id="stats"></div>
+</header>
+
+<section class="ref">
+  <div class="card">
+    <h2>Build a credential union</h2>
+    <p class="note" style="margin-top:-4px">Choose one or more full-access authorization profiles. The table becomes
+    their distinct URL union and the generated login works for exactly that field combination. No master secret or
+    derivation logic is embedded in this page.</p>
+    <div class="profilepicker" id="profilepicker"></div>
+    <div class="unionresult">
+      <div class="unionhead"><b id="uniontitle">Select at least one profile</b><button class="quietbtn" id="clearprofiles">Clear</button></div>
+      <div class="uniongrid">
+        <span class="label">Username</span><button class="copyvalue" id="unionuser" disabled>—</button>
+        <span class="label">Password</span><button class="copyvalue" id="unionpass" disabled>—</button>
+      </div>
+      <p class="unionscope" id="unionscope">With nothing selected, the table shows the complete constructor catalog.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Auth handshake</h2>
+<pre>connect <b>:25010</b> → read <span class="k">&lt;Status&gt;&lt;Init/&gt;</span>
+<span class="k">&lt;Req&gt;&lt;Protocol version="1"/&gt;</span>
+<span class="k">&lt;Req&gt;&lt;Authenticate phase="challenge"/&gt;</span>
+  ← nonce
+digest = b64( SHA256(
+   <b>"user:pass:nonce:cnonce"</b> ))
+   <i>each field cut to 44 chars</i>
+<span class="k">&lt;Req&gt;&lt;Authenticate phase="response"
+   user cnonce digest/&gt;</span> → <b>&lt;Rsp/&gt;</b></pre>
+    <p class="note">The 44-char truncation trips naïve clients — a full-length nonce fails even with the right password.</p>
+  </div>
+  <div class="card" style="grid-column:1/-1">
+    <h2>Request verbs &mdash; read <i>and</i> control</h2>
+    <div class="verbs">
+      <span class="verb">Get</span><span class="verb">Subscribe</span><span class="verb">Unsubscribe</span>
+      <span class="verb">Dir</span><span class="verb">Interface</span><span class="verb">ObjectInfo</span>
+      <span class="verb">Capabilities</span><span class="verb">ServerInfo</span><span class="verb on">Call</span>
+      <span class="verb">Heartbeat</span><span class="verb">Authenticate</span><span class="verb">Protocol</span>
+      <span class="verb" style="opacity:.5;text-decoration:line-through">Set</span>
+    </div>
+<pre>read    <span class="k">&lt;Req&gt;&lt;Get url="engineSpeed"/&gt;</span>
+stream  <span class="k">&lt;Req&gt;&lt;Subscribe url="yawRate" ival="100" content="true"/&gt;</span>
+list    <span class="k">&lt;Req&gt;&lt;Dir urlPattern="*" numOfEntries="300"/&gt;</span>
+<b>control</b> <span class="k">&lt;Req&gt;&lt;Call url="Media_Pause"/&gt;</span>   → &lt;Rsp/&gt; success</pre>
+    <p class="note">Actions (<code>Media_Play/Pause</code>, <code>Sound_Mute</code>, <code>Sound_IncreaseVolume</code>,
+    <code>Media_NextTrack</code>) are invoked with <b>Call</b> — EXLAP is not read-only. There is no <code>Set</code> verb.</p>
+  </div>
+</section>
+
+<div class="controls">
+  <div class="row">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="q" type="search" placeholder="Search 260 constructors…" autocomplete="off" aria-label="Search constructors">
+    </div>
+    <select id="dom" aria-label="Filter by domain"><option value="">All domains</option></select>
+    <div class="count" id="count"></div>
+  </div>
+</div>
+
+<div class="tablewrap">
+  <table>
+    <thead><tr>
+      <th class="sortable" data-s="n">Object <span class="ar" id="ar-n">↕</span></th>
+      <th class="sortable" data-s="d">Domain <span class="ar" id="ar-d">↕</span></th>
+      <th>Registration gate</th>
+      <th>Operation</th>
+    </tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
+</div>
+<div class="empty" id="empty" hidden>No objects match.</div>
+
+<footer>
+  <p><b>Method:</b> the 260-name superset comes from the analyzed plugin's
+  <code>add&lt;name&gt;P17_exlap_ServerCtxt</code> symbols. Measured union membership comes from isolated live <code>Dir</code>
+  captures; the 511 selectable credentials are precomputed offline without publishing the master secret. Registration gates come from exhaustive execution of
+  the plugin's <code>initServer</code> branch graph across all 16 combinations of Vehicle Data, Navigation, Rear Seat Entertainment and
+  High Performance FSID states. The reference state predicts exactly the 168 URLs returned live by
+  <code>OPEN-FFFFFF</code>. <b>Measured credential counts overlap and must not be added together.</b> The registration
+  gate and Read-versus-Call interface kind are known for every entry; only the isolated credential assignment of
+  Rear Seat Entertainment URLs awaits an equipped-unit capture.</p>
+  <p>This is a cross-unit research atlas, not a promise that every object exists on every Porsche/VW head unit.
+  Firmware family, FSIDs, installed hardware, brand and region can all change the live directory. No standalone EXLAP
+  schema XML was found under <code>/eso</code>, <code>/mnt/app</code>, <code>/etc</code> or <code>/mnt/efs</code> on the
+  analyzed unit; its object/interface schema is constructed by <code>libexlap_plugin.so</code> and exposed as runtime XML responses.</p>
+</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="exlap_union_credentials.js"></script>
+<script>
+const DATA=[{"n":"Car_ambienceLightColour","d":"Vehicle state","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Car_vehicleInformation","d":"Vehicle state","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Car_vehicleState","d":"Vehicle state","k":"url","i":"object","r":"VD","x":1},{"n":"Car_vehicleStateEntry","d":"Vehicle state","k":"schema","i":"schema","r":"always"},{"n":"Comfort_ActivateColourProfile","d":"Comfort & ambient","k":"url","i":"function","r":"RSE"},{"n":"Comfort_ActivateSoundProfile","d":"Comfort & ambient","k":"url","i":"function","r":"RSE"},{"n":"Comfort_ActiveAmbientProfile","d":"Comfort & ambient","k":"url","i":"object","r":"RSE"},{"n":"Comfort_AmbientColor","d":"Comfort & ambient","k":"schema","i":"schema","r":"always"},{"n":"Comfort_AmbientColours","d":"Comfort & ambient","k":"url","i":"object","r":"RSE"},{"n":"Comfort_AmbientProfile","d":"Comfort & ambient","k":"schema","i":"schema","r":"always"},{"n":"Comfort_AmbientZone","d":"Comfort & ambient","k":"schema","i":"schema","r":"always"},{"n":"Comfort_AmbientZones","d":"Comfort & ambient","k":"url","i":"object","r":"RSE"},{"n":"Comfort_AvailAmbientProfiles","d":"Comfort & ambient","k":"url","i":"object","r":"RSE"},{"n":"Comfort_CarSeat","d":"Comfort & ambient","k":"schema","i":"schema","r":"always"},{"n":"Comfort_CarSeatsStatus","d":"Comfort & ambient","k":"url","i":"object","r":"RSE"},{"n":"Comfort_ResetSoundProfile","d":"Comfort & ambient","k":"url","i":"function","r":"RSE"},{"n":"Comfort_SeatTempControl","d":"Comfort & ambient","k":"url","i":"function","r":"RSE"},{"n":"Comfort_SetAmbientZone","d":"Comfort & ambient","k":"url","i":"function","r":"RSE"},{"n":"Context_State","d":"Context","k":"schema","i":"schema","r":"always"},{"n":"Context_States","d":"Context","k":"url","i":"object","r":"NAVI | RSE","x":1},{"n":"EcoHMI_Event","d":"Eco","k":"url","i":"object","r":"VD","x":1},{"n":"EcoHMI_Score","d":"Eco","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"ExAc_GetToken","d":"External access","k":"url","i":"function","r":"NAVI | RSE | VD","x":1},{"n":"ExAc_ReleaseToken","d":"External access","k":"url","i":"function","r":"NAVI | RSE | VD","x":1},{"n":"ExAc_Resources","d":"External access","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"ExAc_TouchToken","d":"External access","k":"url","i":"function","r":"NAVI | RSE | VD","x":1},{"n":"ExAc_resourceListItem","d":"External access","k":"schema","i":"schema","r":"always"},{"n":"GetImageByLocator","d":"Images","k":"url","i":"function","r":"RSE"},{"n":"GetImageInformationByLocator","d":"Images","k":"url","i":"function","r":"RSE"},{"n":"MediaBrowser_ChangeFolder","d":"Media browser","k":"url","i":"function","r":"RSE"},{"n":"MediaBrowser_Entry","d":"Media browser","k":"schema","i":"schema","r":"always"},{"n":"MediaBrowser_FollowMode","d":"Media browser","k":"url","i":"object","r":"RSE"},{"n":"MediaBrowser_FollowModeOff","d":"Media browser","k":"url","i":"function","r":"RSE"},{"n":"MediaBrowser_FollowModeOn","d":"Media browser","k":"url","i":"function","r":"RSE"},{"n":"MediaBrowser_GetList","d":"Media browser","k":"url","i":"function","r":"RSE"},{"n":"MediaBrowser_ListState","d":"Media browser","k":"url","i":"object","r":"RSE"},{"n":"MediaBrowser_Path","d":"Media browser","k":"url","i":"object","r":"RSE"},{"n":"MediaBrowser_PathCurrentTrack","d":"Media browser","k":"url","i":"object","r":"RSE"},{"n":"MediaBrowser_Play","d":"Media browser","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"MediaBrowser_SetSource","d":"Media browser","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"MediaBrowser_TrackInfo","d":"Media browser","k":"schema","i":"schema","r":"always"},{"n":"Media_AvailableSources","d":"Media player","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Media_Capabilities","d":"Media player","k":"schema","i":"schema","r":"always"},{"n":"Media_NextTrack","d":"Media player","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Media_Pause","d":"Media player","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Media_Play","d":"Media player","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Media_PlayMode","d":"Media player","k":"url","i":"object","r":"RSE"},{"n":"Media_PlayerState","d":"Media player","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Media_PreviousTrack","d":"Media player","k":"url","i":"function","r":"RSE"},{"n":"Media_SetPlayMode","d":"Media player","k":"url","i":"function","r":"RSE"},{"n":"Media_SetTrackTime","d":"Media player","k":"url","i":"function","r":"RSE"},{"n":"Media_SourceState","d":"Media player","k":"schema","i":"schema","r":"always"},{"n":"Media_SwitchSource","d":"Media player","k":"url","i":"function","r":"RSE"},{"n":"Media_Track","d":"Media player","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Nav_ActiveRoute","d":"Navigation","k":"url","i":"object","r":"RSE"},{"n":"Nav_AddStopOver","d":"Navigation","k":"url","i":"function","r":"RSE"},{"n":"Nav_Address","d":"Navigation","k":"schema","i":"schema","r":"always"},{"n":"Nav_Altitude","d":"Navigation","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"Nav_CurrentPosition","d":"Navigation","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"Nav_GeoPosition","d":"Navigation","k":"url","i":"object","r":"NAVI | VD","x":1},{"n":"Nav_GpxImport","d":"Navigation","k":"url","i":"function","r":"NAVI","x":1},{"n":"Nav_GuidanceDestination","d":"Navigation","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"Nav_GuidanceRemaining","d":"Navigation","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"Nav_GuidanceState","d":"Navigation","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"Nav_Heading","d":"Navigation","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"Nav_LastDestination","d":"Navigation","k":"schema","i":"schema","r":"always"},{"n":"Nav_LastDestinations","d":"Navigation","k":"url","i":"object","r":"NAVI","x":1},{"n":"Nav_ResolveAddress","d":"Navigation","k":"url","i":"function","r":"NAVI | RSE | VD","x":1},{"n":"Nav_ResolveLastDestination","d":"Navigation","k":"url","i":"function","r":"NAVI","x":1},{"n":"Nav_StartGuidance","d":"Navigation","k":"url","i":"function","r":"NAVI | RSE | VD","x":1},{"n":"Nav_StopGuidance","d":"Navigation","k":"url","i":"function","r":"NAVI | RSE | VD","x":1},{"n":"Nav_Waypoint","d":"Navigation","k":"schema","i":"schema","r":"always"},{"n":"Phone_ActiveCalls","d":"Phone","k":"url","i":"object","r":"RSE"},{"n":"Phone_Call","d":"Phone","k":"schema","i":"schema","r":"always"},{"n":"Phone_CallContact","d":"Phone","k":"url","i":"function","r":"RSE"},{"n":"Phone_CallOption","d":"Phone","k":"schema","i":"schema","r":"always"},{"n":"Phone_Contact","d":"Phone","k":"schema","i":"schema","r":"always"},{"n":"Phone_SetCallAction","d":"Phone","k":"url","i":"function","r":"RSE"},{"n":"Radio_AMPresets","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"Radio_AMStations","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_ActivateBand","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"Radio_AvailableBands","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_Band","d":"Radio","k":"schema","i":"schema","r":"always"},{"n":"Radio_DABEnsembles","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_DABPresets","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"Radio_DABServiceComponent","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_DABServices","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_FMPresets","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"Radio_FMStations","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_FrequencyDecrease","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"Radio_FrequencyIncrease","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"Radio_FrequencyRanges","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"Radio_PodcastEpisode","d":"Radio","k":"schema","i":"schema","r":"always"},{"n":"Radio_Preset","d":"Radio","k":"schema","i":"schema","r":"always"},{"n":"Radio_PresetDelete","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"Radio_PresetStore","d":"Radio","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Radio_SDARSPresets","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_SDARSStations","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_SeekBackward","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"Radio_SeekForward","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"Radio_Station","d":"Radio","k":"schema","i":"schema","r":"always"},{"n":"Radio_StationNext","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"Radio_StationPrevious","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"Radio_StatusInfoHybrid","d":"Radio","k":"schema","i":"schema","r":"always"},{"n":"Radio_TA","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"Radio_Text","d":"Radio","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Radio_TuneFrequency","d":"Radio","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Radio_TuneStation","d":"Radio","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Radio_Tuner","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"Radio_USLPresets","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"Radio_USLStations","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"Radio_WebPreset","d":"Radio","k":"schema","i":"schema","r":"always"},{"n":"Radio_WebStation","d":"Radio","k":"schema","i":"schema","r":"always"},{"n":"Radio_WebStationGenere","d":"Radio","k":"schema","i":"schema","r":"always"},{"n":"SPI_ConnectedDevice","d":"Smartphone","k":"url","i":"object","r":"RSE"},{"n":"Sound_ActiveProfile","d":"Sound","k":"url","i":"object","r":"RSE"},{"n":"Sound_AvailableProfiles","d":"Sound","k":"url","i":"object","r":"RSE"},{"n":"Sound_BalanceFader","d":"Sound","k":"url","i":"object","r":"RSE"},{"n":"Sound_BalanceFaderSetup","d":"Sound","k":"url","i":"object","r":"RSE"},{"n":"Sound_DecreaseVolume","d":"Sound","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Sound_IncreaseVolume","d":"Sound","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Sound_Mute","d":"Sound","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Sound_Profile","d":"Sound","k":"schema","i":"schema","r":"always"},{"n":"Sound_Range","d":"Sound","k":"schema","i":"schema","r":"always"},{"n":"Sound_Ranges","d":"Sound","k":"url","i":"object","r":"RSE"},{"n":"Sound_SetBalanceFader","d":"Sound","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Sound_SetFunctionValue","d":"Sound","k":"url","i":"function","r":"RSE"},{"n":"Sound_Unmute","d":"Sound","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"Sound_Value","d":"Sound","k":"schema","i":"schema","r":"always"},{"n":"Sound_Values","d":"Sound","k":"url","i":"object","r":"RSE"},{"n":"Sound_Volume","d":"Sound","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"Sound_VolumeInformation","d":"Sound","k":"schema","i":"schema","r":"always"},{"n":"Sound_VolumeSetup","d":"Sound","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"System_DayNight","d":"System & units","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"System_HMISkin","d":"System & units","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"System_Language","d":"System & units","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"System_MIBVersion","d":"System & units","k":"url","i":"object","r":"RSE"},{"n":"System_ProximityRecognition","d":"System & units","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"System_RestrictionMode","d":"System & units","k":"url","i":"object","r":"NAVI | RSE","x":1},{"n":"System_UnitDistance","d":"System & units","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"System_activeSource","d":"System & units","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"WebRadio_CurrentStation","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"WebRadio_LastListened","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"WebRadio_PodcastEpisodes","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"WebRadio_Presets","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"WebRadio_TopStations","d":"Radio","k":"url","i":"object","r":"RSE"},{"n":"WebRadio_TuneStation","d":"Radio","k":"url","i":"function","r":"RSE"},{"n":"absChargingAirPressure","d":"Forced induction","k":"url","i":"object","r":"VD","x":1},{"n":"accIsActive","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"acceleratorKickDown","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"acceleratorPosition","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"allWheelDriveTorque","d":"Powertrain","k":"url","i":"object","r":"HP","x":1},{"n":"ambienceLight_brightness","d":"Comfort & ambient","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"ambienceLight_control","d":"Comfort & ambient","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"ambienceLight_illuminationSet","d":"Comfort & ambient","k":"schema","i":"schema","r":"always"},{"n":"ambienceLight_installation","d":"Comfort & ambient","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"ambienceLight_logSetName","d":"Comfort & ambient","k":"schema","i":"schema","r":"always"},{"n":"ambienceLight_profiles","d":"Comfort & ambient","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"ambienceLight_sets","d":"Comfort & ambient","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"batteryVoltage","d":"Fluids & tyres","k":"url","i":"object","r":"VD","x":1},{"n":"blinkingState","d":"Body & state","k":"url","i":"object","r":"VD","x":1},{"n":"brakePressure","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"chassisOversteering","d":"Dynamics","k":"url","i":"object","r":"HP","x":1},{"n":"chassisUndersteering","d":"Dynamics","k":"url","i":"object","r":"HP","x":1},{"n":"clampState","d":"Body & state","k":"url","i":"object","r":"VD","x":1},{"n":"clutch","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"coastingIsActive","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"combustionEngineDisplacement","d":"Other","k":"url","i":"object","r":"VD","x":1},{"n":"combustionEngineInjection","d":"Other","k":"url","i":"object","r":"VD","x":1},{"n":"consumptionLongTermGeneral","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"consumptionShortTermGeneral","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"coolantTemperature","d":"Temperatures","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"currentConsumptionPrimary","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"currentConsumptionSecondary","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"currentGear","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"currentOutputPower","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"currentTorque","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"cycleConsumptionPrimary","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"cycleConsumptionSecondary","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"dayMilage","d":"Odometer & trip","k":"url","i":"object","r":"VD","x":1},{"n":"dayMilage_HP","d":"Odometer & trip","k":"url","i":"object","r":"HP","x":1},{"n":"displayNightDesign","d":"Body & state","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"doorState","d":"Body & state","k":"url","i":"object","r":"VD","x":1},{"n":"driveMode","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"driverIsBraking","d":"Other","k":"url","i":"object","r":"VD","x":1},{"n":"engineSpeed","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"engineTypes","d":"Powertrain","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"espLamp","d":"Dynamics","k":"url","i":"object","r":"HP","x":1},{"n":"espPassiveSensing","d":"Dynamics","k":"url","i":"object","r":"HP","x":1},{"n":"espTyreVelocities","d":"Dynamics","k":"url","i":"object","r":"HP","x":1},{"n":"fuelLevelState","d":"Fluids & tyres","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"fuelWarningPrimaryTank","d":"Fluids & tyres","k":"url","i":"object","r":"VD","x":1},{"n":"fuelWarningSecondaryTank","d":"Fluids & tyres","k":"url","i":"object","r":"VD","x":1},{"n":"gearTransmissionMode","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"gearboxOilTemperature","d":"Temperatures","k":"url","i":"object","r":"VD","x":1},{"n":"hevOperationMode","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"hevacConfiguration","d":"Powertrain","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"hevacFanLevelRear","d":"Powertrain","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"lateralAcceleration","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"lightState_front","d":"Body & state","k":"url","i":"object","r":"VD","x":1},{"n":"lightState_rear","d":"Body & state","k":"url","i":"object","r":"VD","x":1},{"n":"longTermConsumptionPrimary","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"longTermConsumptionSecondary","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"longitudinalAcceleration","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"maxChargingAirPressure","d":"Forced induction","k":"url","i":"object","r":"VD","x":1},{"n":"maxOutputPower","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"navPosition_HP","d":"Other","k":"url","i":"object","r":"HP","x":1},{"n":"offroadTiltAngle","d":"Dynamics","k":"url","i":"object","r":"HP | VD","x":1},{"n":"offroadTiltAngleMaxValues","d":"Dynamics","k":"url","i":"object","r":"HP | VD","x":1},{"n":"oilLevel","d":"Fluids & tyres","k":"url","i":"object","r":"VD","x":1},{"n":"oilTemperature","d":"Temperatures","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"outsideTemperature","d":"Temperatures","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"parkingBrake","d":"Body & state","k":"url","i":"object","r":"VD","x":1},{"n":"powermeter","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"recommendedGear","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"recuperationLevel","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"relAllWheelDriveTorque","d":"Powertrain","k":"url","i":"object","r":"HP","x":1},{"n":"relChargingAirPressure","d":"Forced induction","k":"url","i":"object","r":"VD","x":1},{"n":"reverseGear","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"seatHeater_zone1","d":"Other","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"seatHeater_zone2","d":"Other","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"seatHeater_zone3","d":"Other","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"seatHeater_zone4","d":"Other","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"seatVentilation_zone3","d":"Other","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"seatVentilation_zone4","d":"Other","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"serviceInspection","d":"Fluids & tyres","k":"url","i":"object","r":"VD","x":1},{"n":"serviceOil","d":"Fluids & tyres","k":"url","i":"object","r":"VD","x":1},{"n":"shiftRecommendation","d":"Other","k":"url","i":"object","r":"HP","x":1},{"n":"shortTermConsumptionPrimary","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"shortTermConsumptionSecondary","d":"Consumption","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"startStopState","d":"Powertrain","k":"url","i":"object","r":"VD","x":1},{"n":"stopWatch_control","d":"Lap timer","k":"url","i":"function","r":"HP","x":1},{"n":"stopWatch_lapTime","d":"Lap timer","k":"url","i":"object","r":"HP","x":1},{"n":"stopWatch_previousLapTime","d":"Lap timer","k":"url","i":"object","r":"HP","x":1},{"n":"stopWatch_totalTime","d":"Lap timer","k":"url","i":"object","r":"HP","x":1},{"n":"suspensionProfile","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"suspensionStates","d":"Dynamics","k":"url","i":"object","r":"HP | VD","x":1},{"n":"tankLevelPrimary","d":"Fluids & tyres","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"tankLevelSecondary","d":"Fluids & tyres","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"temperatureRearLeft","d":"Temperatures","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"temperatureRearRight","d":"Temperatures","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"temperature_control","d":"Temperatures","k":"url","i":"function","r":"RSE | VD","x":1},{"n":"torqueDistribution","d":"Powertrain","k":"url","i":"object","r":"HP","x":1},{"n":"totalDistance","d":"Odometer & trip","k":"url","i":"object","r":"VD","x":1},{"n":"tyrePressures","d":"Fluids & tyres","k":"url","i":"object","r":"HP | VD","x":1},{"n":"tyreRequiredPressures","d":"Fluids & tyres","k":"url","i":"object","r":"HP | VD","x":1},{"n":"tyreStates","d":"Fluids & tyres","k":"url","i":"object","r":"HP | VD","x":1},{"n":"tyreTemperatures","d":"Temperatures","k":"url","i":"object","r":"VD","x":1},{"n":"tyreTemperatures_HP","d":"Temperatures","k":"url","i":"object","r":"HP","x":1},{"n":"unitDateFormat","d":"System & units","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"unitPressure","d":"System & units","k":"url","i":"object","r":"VD","x":1},{"n":"unitTemperature","d":"Temperatures","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"unitTimeFormat","d":"System & units","k":"url","i":"object","r":"NAVI | RSE | VD","x":1},{"n":"unitVolume","d":"System & units","k":"url","i":"object","r":"VD","x":1},{"n":"vehicleDate","d":"Body & state","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"vehicleIdenticationNumber","d":"Body & state","k":"url","i":"object","r":"HP | NAVI | RSE | VD","x":1},{"n":"vehicleSpeed","d":"Powertrain","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"vehicleTime","d":"Body & state","k":"url","i":"object","r":"RSE | VD","x":1},{"n":"wheelAngle","d":"Dynamics","k":"url","i":"object","r":"VD","x":1},{"n":"yawRate","d":"Dynamics","k":"url","i":"object","r":"VD","x":1}];
+const OPEN_CREDS=[
+ {key:"VD",f:1,short:"Vehicle",name:"Vehicle Telemetry",u:"OPEN-300000",p:"O6z0lZ3/+IbaUmDxnd0tJ95p8K5pHvV/AoaOsJn6A/c=",n:"75 measured",role:"vehicledata · full field value 3 · Vehicle Data FSID"},
+ {key:"NAV",f:3,short:"Navigation",name:"Navigation Data",u:"OPEN-030000",p:"f9uydlV5NXZbkQQ3la0MgfEVRebbnYftED9wT0Ie48g=",n:"22 measured",role:"navigation · full field value 3 · Navigation FSID"},
+ {key:"ECO",f:4,short:"Eco",name:"Eco & Driver Context",u:"OPEN-00C000",p:"g8OFe0DOqeA3hAwikobi6dath7YDXHj7IHrLmVo9xxI=",n:"26 measured",role:"ecohmi · full field value 3 · Vehicle Data FSID"},
+ {key:"INT",f:5,short:"Interior",name:"Interior & Climate",u:"OPEN-003000",p:"B++ENIgKchRpzhwglOW3yvfvfRZJTjOFoeuf9HJMHhY=",n:"31 measured",role:"interior · full field value 3 · Vehicle Data or Rear Seat Entertainment FSID"},
+ {key:"MISC",f:6,short:"Mixed",name:"Infotainment & Mixed Data",u:"OPEN-000C00",p:"gJZlPWrttYGuex7UlyI2GhyQ/3FTeMRknlYeaXH70TQ=",n:"60 measured",role:"misc · full field value 3 · Vehicle Data or Rear Seat Entertainment FSID"},
+ {key:"PERF",f:7,short:"Performance+",name:"High-Performance Extensions",u:"OPEN-000300",p:"N+ae73tgz7vtuzGDubmMtWmlBrDAtn9gEy8y8/q8EuQ=",n:"23 measured",role:"isolated vehicledata_performance field · not the complete PTP credential"},
+ {key:"GENERAL",f:0,short:"Rear Seat Core",name:"Rear Seat Entertainment Core",u:"OPEN-C00000",p:"SGt5VscsjouAyYf2/diCOQ+V8kjojDBAdd7i48mg3Y4=",n:"unknown",role:"general · full field value 3 · requires a Rear Seat Entertainment FSID"},
+ {key:"MEDIA",f:2,short:"Rear Seat Media",name:"Rear Seat Entertainment Media",u:"OPEN-0C0000",p:"e90OlX8IVYnMtySEeBMkdkZgrCTFwW6+autLlc9NE/Y=",n:"unknown",role:"media · full field value 3 · requires a Rear Seat Entertainment FSID"},
+ {key:"PREMIUM",f:8,short:"Rear Seat Premium",name:"Rear Seat Entertainment Premium Comfort",u:"OPEN-0000C0",p:"dOAQWvPak/OnG1MEKJJOrmFz+mwvWKeNbIuXp8889fY=",n:"unknown",role:"interior_comfort_premium · full field value 3 · requires a Rear Seat Entertainment FSID"}
+];
+const PROFILE_URLS={
+ VD:"Car_vehicleState absChargingAirPressure accIsActive acceleratorKickDown acceleratorPosition batteryVoltage blinkingState brakePressure clampState clutch coastingIsActive combustionEngineDisplacement combustionEngineInjection consumptionLongTermGeneral consumptionShortTermGeneral coolantTemperature currentConsumptionPrimary currentConsumptionSecondary currentGear currentOutputPower currentTorque cycleConsumptionPrimary cycleConsumptionSecondary dayMilage doorState driveMode driverIsBraking engineSpeed engineTypes fuelLevelState fuelWarningPrimaryTank fuelWarningSecondaryTank gearTransmissionMode gearboxOilTemperature hevOperationMode lateralAcceleration lightState_front lightState_rear longTermConsumptionPrimary longTermConsumptionSecondary longitudinalAcceleration maxChargingAirPressure maxOutputPower offroadTiltAngle offroadTiltAngleMaxValues oilLevel oilTemperature outsideTemperature parkingBrake powermeter recommendedGear recuperationLevel relChargingAirPressure reverseGear serviceInspection serviceOil shortTermConsumptionPrimary shortTermConsumptionSecondary startStopState suspensionProfile suspensionStates tankLevelPrimary tankLevelSecondary totalDistance tyrePressures tyreRequiredPressures tyreStates tyreTemperatures unitPressure unitTemperature unitVolume vehicleIdenticationNumber vehicleSpeed wheelAngle yawRate".split(" "),
+ NAV:"Context_States ExAc_GetToken ExAc_ReleaseToken ExAc_Resources ExAc_TouchToken Nav_Altitude Nav_CurrentPosition Nav_GeoPosition Nav_GpxImport Nav_GuidanceDestination Nav_GuidanceRemaining Nav_GuidanceState Nav_Heading Nav_LastDestinations Nav_ResolveAddress Nav_ResolveLastDestination Nav_StartGuidance Nav_StopGuidance System_RestrictionMode System_UnitDistance unitTimeFormat vehicleIdenticationNumber".split(" "),
+ ECO:"EcoHMI_Event EcoHMI_Score Nav_GeoPosition accIsActive acceleratorKickDown clutch coastingIsActive currentConsumptionPrimary currentConsumptionSecondary currentGear dayMilage driveMode driverIsBraking engineSpeed engineTypes gearTransmissionMode powermeter recommendedGear recuperationLevel reverseGear seatHeater_zone1 seatHeater_zone2 seatHeater_zone3 seatHeater_zone4 vehicleIdenticationNumber vehicleSpeed".split(" "),
+ INT:"Car_ambienceLightColour Car_vehicleInformation System_DayNight System_HMISkin System_Language System_ProximityRecognition System_UnitDistance ambienceLight_brightness ambienceLight_control ambienceLight_installation ambienceLight_profiles ambienceLight_sets displayNightDesign hevacConfiguration hevacFanLevelRear outsideTemperature seatHeater_zone1 seatHeater_zone2 seatHeater_zone3 seatHeater_zone4 seatVentilation_zone3 seatVentilation_zone4 temperatureRearLeft temperatureRearRight temperature_control unitDateFormat unitTemperature unitTimeFormat vehicleDate vehicleIdenticationNumber vehicleTime".split(" "),
+ MISC:"EcoHMI_Score ExAc_GetToken ExAc_ReleaseToken ExAc_Resources ExAc_TouchToken MediaBrowser_Play MediaBrowser_SetSource Media_AvailableSources Media_NextTrack Media_Pause Media_Play Media_PlayerState Media_Track Nav_Altitude Nav_CurrentPosition Nav_GuidanceDestination Nav_GuidanceRemaining Nav_GuidanceState Nav_Heading Nav_ResolveAddress Nav_StartGuidance Nav_StopGuidance Radio_AMStations Radio_AvailableBands Radio_DABEnsembles Radio_DABServiceComponent Radio_DABServices Radio_FMStations Radio_PresetStore Radio_SDARSPresets Radio_SDARSStations Radio_Text Radio_TuneFrequency Radio_TuneStation Sound_DecreaseVolume Sound_IncreaseVolume Sound_Mute Sound_SetBalanceFader Sound_Unmute Sound_Volume Sound_VolumeSetup System_activeSource consumptionLongTermGeneral consumptionShortTermGeneral coolantTemperature currentConsumptionPrimary currentConsumptionSecondary cycleConsumptionPrimary cycleConsumptionSecondary engineTypes fuelLevelState longTermConsumptionPrimary longTermConsumptionSecondary oilTemperature shortTermConsumptionPrimary shortTermConsumptionSecondary tankLevelPrimary tankLevelSecondary vehicleIdenticationNumber vehicleSpeed".split(" "),
+ PERF:"allWheelDriveTorque chassisOversteering chassisUndersteering dayMilage_HP espLamp espPassiveSensing espTyreVelocities navPosition_HP offroadTiltAngle offroadTiltAngleMaxValues relAllWheelDriveTorque shiftRecommendation stopWatch_control stopWatch_lapTime stopWatch_previousLapTime stopWatch_totalTime suspensionStates torqueDistribution tyrePressures tyreRequiredPressures tyreStates tyreTemperatures_HP vehicleIdenticationNumber".split(" ")
+};
+const PROFILE_BY_KEY=Object.fromEntries(OPEN_CREDS.map(c=>[c.key,c]));
+for(const c of OPEN_CREDS){
+ c.urls=PROFILE_URLS[c.key]?new Set(PROFILE_URLS[c.key]):null;
+ c.color=`var(--c-${c.key})`;
+}
+const MAPPED_CREDS=OPEN_CREDS.filter(c=>c.urls);
+for(const o of DATA)o.g=MAPPED_CREDS.filter(c=>c.urls.has(o.n)).map(c=>c.key);
+const $=s=>document.querySelector(s);
+const urls=DATA.filter(o=>o.k==='url'), schemas=DATA.filter(o=>o.k==='schema'),
+ rseOnly=urls.filter(o=>o.r==='RSE'), seen=urls.filter(o=>o.x),
+ doms=[...new Set(DATA.map(o=>o.d))].sort();
+// stats
+$('#stats').innerHTML=[
+ [''+urls.length,'addressable URLs',1],[''+seen.length,'reference-unit sample',0],[''+rseOnly.length,'Rear Seat Entertainment-only URLs',0],[''+schemas.length,'nested schema types',0],[''+OPEN_CREDS.length,'selectable profiles',0]
+].map(([v,k,hl])=>`<div class="stat${hl?' hl':''}"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+// union profile picker
+$('#profilepicker').innerHTML=OPEN_CREDS.map(c=>`<button class="profile-option" aria-pressed="false"
+ data-profile="${c.key}" style="--pc:${c.color}"><span class="pn">${c.name}</span>
+ <span class="pc">${c.n}</span><span class="check">○</span></button>`).join('');
+// domain select
+$('#dom').insertAdjacentHTML('beforeend',doms.map(d=>`<option>${d}</option>`).join(''));
+let state={q:'',dom:'',selected:new Set(),sort:'n',dir:1};
+function selectedProfiles(){return OPEN_CREDS.filter(c=>state.selected.has(c.key))}
+function suffixFor(profiles){
+ const nibbles=[0,0,0,0,0,0];
+ for(const c of profiles)nibbles[Math.floor(c.f/2)]|=(c.f%2===0?12:3);
+ return nibbles.map(n=>n.toString(16).toUpperCase()).join('');
+}
+function unionScope(){
+ const selected=selectedProfiles(), known=new Set();
+ for(const c of selected)if(c.urls)for(const name of c.urls)known.add(name);
+ const hasRse=selected.some(c=>!c.urls);
+ const candidates=hasRse?new Set(urls.filter(o=>o.r.split('|').map(v=>v.trim()).includes('RSE')).map(o=>o.n)):new Set();
+ const displayed=new Set([...known,...candidates]);
+ return {selected,known,candidates,displayed,hasRse};
+}
+function renderCredential(scope){
+ const user=$('#unionuser'),pass=$('#unionpass'),title=$('#uniontitle'),note=$('#unionscope');
+ if(!scope.selected.length){
+  title.textContent='Select at least one profile';
+  for(const el of [user,pass]){el.textContent='—';el.disabled=true;delete el.dataset.copy}
+  note.className='unionscope';note.textContent='With nothing selected, the table shows the complete constructor catalog.';
+  return;
+ }
+ const suffix=suffixFor(scope.selected),username=`OPEN-${suffix}`,password=UNION_PASSWORDS[suffix];
+ title.textContent=`${scope.selected.length} profile${scope.selected.length===1?'':'s'} selected`;
+ user.textContent=username;user.disabled=false;user.dataset.copy=username;
+ pass.textContent=password;pass.disabled=false;pass.dataset.copy=password;
+ if(scope.hasRse){
+  note.className='unionscope warn';
+  note.textContent=`${scope.known.size} exactly measured URLs; the table expands to ${scope.displayed.size} with ${scope.candidates.size} overlapping RSE-registered candidates. The exact RSE profile split is not yet measured.`;
+ }else{
+  note.className='unionscope';
+  note.textContent=`${scope.displayed.size} distinct URLs in this measured union. Overlaps are counted once.`;
+ }
+}
+function gate(o){
+ if(o.k==='schema')return `<span class="pill tier" data-c="DEFAULT">Always · nested schema</span>`;
+ const names={VD:'Vehicle Data',NAVI:'Navigation',RSE:'Rear Seat Entertainment',HP:'High Performance'};
+ const colors={VD:'VD',NAVI:'NAV',RSE:'RSE',HP:'HP'};
+ return `<div class="acc">${o.r.split('|').map(v=>v.trim()).map((v,i)=>
+  `${i?'<span class="gateor">OR</span>':''}<span class="pill" data-c="${colors[v]}">${names[v]}</span>`).join('')}</div>`;
+}
+function operation(o){
+ if(o.i==='schema')return `<span class="pill tier" data-c="DEFAULT">Nested type</span>`;
+ if(o.i==='function')return `<span class="pill" data-op="call">Call · control</span>`;
+ return `<span class="pill" data-op="read">Read</span>`;
+}
+function render(){
+ const scope=unionScope();renderCredential(scope);
+ let rows=DATA.filter(o=>{
+  if(scope.selected.length && !scope.displayed.has(o.n))return false;
+  if(state.q && !o.n.toLowerCase().includes(state.q))return false;
+  if(state.dom && o.d!==state.dom)return false;
+  return true;
+ });
+ rows.sort((a,b)=>{let x=a[state.sort],y=b[state.sort];return x<y?-state.dir:x>y?state.dir:(a.n<b.n?-1:1);});
+ $('#tb').innerHTML=rows.map(o=>`<tr class="${o.k==='schema'?'schema':''}">
+   <td><span class="obj" title="click to copy" data-copy="${o.n}">${o.n}</span></td>
+   <td class="dom">${o.d}</td><td>${gate(o)}</td><td>${operation(o)}</td></tr>`).join('');
+ $('#empty').hidden=rows.length>0;
+ $('#count').textContent=scope.selected.length?`${rows.length} shown · ${scope.displayed.size} in union`:`${rows.length} of 260`;
+}
+$('#q').addEventListener('input',e=>{state.q=e.target.value.toLowerCase().trim();render();});
+$('#dom').addEventListener('change',e=>{state.dom=e.target.value;render();});
+$('#profilepicker').addEventListener('click',e=>{const b=e.target.closest('.profile-option');if(!b)return;
+ const key=b.dataset.profile,selected=!state.selected.has(key);
+ if(selected)state.selected.add(key);else state.selected.delete(key);
+ b.setAttribute('aria-pressed',selected);b.querySelector('.check').textContent=selected?'●':'○';render();});
+$('#clearprofiles').addEventListener('click',()=>{state.selected.clear();
+ document.querySelectorAll('.profile-option').forEach(b=>{b.setAttribute('aria-pressed','false');b.querySelector('.check').textContent='○'});render();});
+document.querySelectorAll('th.sortable').forEach(th=>th.addEventListener('click',()=>{
+ const s=th.dataset.s; state.dir=(state.sort===s)?-state.dir:1; state.sort=s;
+ $('#ar-n').textContent=s==='n'?(state.dir>0?'↑':'↓'):'↕'; $('#ar-d').textContent=s==='d'?(state.dir>0?'↑':'↓'):'↕';
+ render();}));
+let tt;
+document.addEventListener('click',e=>{const el=e.target.closest('[data-copy]');if(!el)return;
+ navigator.clipboard&&navigator.clipboard.writeText(el.dataset.copy);
+ const t=$('#toast');t.textContent='copied '+el.dataset.copy.slice(0,32)+(el.dataset.copy.length>32?'…':'');
+ t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),1400);});
+render();
+</script>
+</body>
+</html>
