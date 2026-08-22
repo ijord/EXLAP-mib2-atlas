@@ -87,9 +87,13 @@ pre{background:var(--surface-2);border:1px solid var(--border);border-radius:9px
 pre b{color:var(--text);font-weight:600}
 pre .k{color:var(--accent)}
 .note{font-size:12px;color:var(--text-dim);margin-top:10px}
-.verbs{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
-.verb{font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim)}
-.verb.on{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 40%,transparent);color:var(--accent);font-weight:600}
+.verbs{display:flex;flex-wrap:wrap;gap:6px 13px;align-items:baseline;margin-bottom:5px}
+.verb{font-family:var(--mono);font-size:11.5px;padding:0 0 2px;color:var(--text-dim);border-bottom:2px solid transparent}
+.verb.key-read{color:var(--c-VD);border-color:var(--c-VD);font-weight:700}
+.verb.key-control{color:var(--c-INT);border-color:var(--c-INT);font-weight:700}
+.verb.unsupported{opacity:.45;text-decoration:line-through}
+.verbnote{font-size:11.5px;color:var(--text-faint);margin:0 0 10px}
+.verbnote .readkey{color:var(--c-VD);font-weight:650}.verbnote .controlkey{color:var(--c-INT);font-weight:650}
 /* controls */
 .controls{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);
   backdrop-filter:blur(8px);padding:12px 0 12px;margin-bottom:4px;border-bottom:1px solid var(--border)}
@@ -195,12 +199,14 @@ digest = b64( SHA256(
   <div class="card" style="grid-column:1/-1">
     <h2>Request verbs &mdash; read <i>and</i> control</h2>
     <div class="verbs">
-      <span class="verb">Get</span><span class="verb">Subscribe</span><span class="verb">Unsubscribe</span>
+      <span class="verb key-read">Get</span><span class="verb key-read">Subscribe</span><span class="verb">Unsubscribe</span>
       <span class="verb">Dir</span><span class="verb">Interface</span><span class="verb">ObjectInfo</span>
-      <span class="verb">Capabilities</span><span class="verb">ServerInfo</span><span class="verb on">Call</span>
+      <span class="verb">Capabilities</span><span class="verb">ServerInfo</span><span class="verb key-control">Call</span>
       <span class="verb">Heartbeat</span><span class="verb">Authenticate</span><span class="verb">Protocol</span>
-      <span class="verb" style="opacity:.5;text-decoration:line-through">Set</span>
+      <span class="verb unsupported">Set</span>
     </div>
+    <p class="verbnote"><span class="readkey">Get / Subscribe</span> read or stream data; <span class="controlkey">Call</span>
+    invokes controls. This is a static protocol reference, not a selector.</p>
 <pre>read    <span class="k">&lt;Req&gt;&lt;Get url="engineSpeed"/&gt;</span>
 stream  <span class="k">&lt;Req&gt;&lt;Subscribe url="yawRate" ival="100" content="true"/&gt;</span>
 list    <span class="k">&lt;Req&gt;&lt;Dir urlPattern="*" numOfEntries="300"/&gt;</span>
