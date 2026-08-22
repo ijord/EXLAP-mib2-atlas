@@ -45,8 +45,9 @@ a{color:var(--accent)}
 h1,h2,h3{text-wrap:balance;margin:0}
 .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--accent);font-weight:600;}
+.eyebrow a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em;margin:.28em 0 .18em;}
-.lede{color:var(--text-dim);max-width:64ch;font-size:16px;margin:0}
+.lede{color:var(--text-dim);width:100%;font-size:16px;margin:0}
 .lede b{color:var(--text);font-weight:600}
 /* stat tiles */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:26px 0 30px}
@@ -152,7 +153,8 @@ footer b{color:var(--text-dim);font-weight:600}
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">VW Group MIB2 HIGH · cross-unit reference · reverse-engineered</div>
+  <div class="eyebrow">VW Group MIB2 HIGH · cross-unit reference · reverse-engineered ·
+    <a href="https://github.com/ijord/MIB_AA_Wireless" target="_blank" rel="noopener noreferrer">Main project on GitHub ↗</a></div>
   <h1>EXLAP Object Atlas</h1>
   <p class="lede"><b>260 compiled data and control objects</b> from an analyzed VW Group MIB2 HIGH build,
   split into <b>229 addressable URLs</b> and <b>31 nested schema types</b>. Each URL is mapped to its exact
